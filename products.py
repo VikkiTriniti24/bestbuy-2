@@ -37,15 +37,43 @@ class Product:
     def show(self) -> str:
         return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
 
-
     def buy(self, quantity: int) -> float:
         if quantity <= 0:
             raise ValueError("Purchase quantity must be greater than zero.")
         if quantity > self.quantity:
             raise ValueError("Not enough stock available.")
-
         total_price = quantity * self.price
         self.set_quantity(self.quantity - quantity)
         return total_price
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name: str, price: float):
+        super().__init__(name, price, quantity=0)
+
+    def is_active(self) -> bool:
+        return True  # Always active, even if quantity is 0
+
+    def buy(self, quantity: int) -> float:
+        if quantity <= 0:
+            raise ValueError("Purchase quantity must be greater than zero.")
+        return quantity * self.price  # No quantity deduction
+
+    def show(self) -> str:
+        return f"{self.name} (Non-Stocked), Price: {self.price}"
+
+
+class LimitedProduct(Product):
+    def __init__(self, name: str, price: float, quantity: int, maximum_per_order: int):
+        super().__init__(name, price, quantity)
+        self.maximum_per_order = maximum_per_order
+
+    def buy(self, quantity: int) -> float:
+        if quantity > self.maximum_per_order:
+            raise ValueError(f"Cannot buy more than {self.maximum_per_order} of this product.")
+        return super().buy(quantity)
+
+    def show(self) -> str:
+        return f"{self.name} (Max {self.maximum_per_order}/order), Price: {self.price}, Quantity: {self.quantity}"
 
 
