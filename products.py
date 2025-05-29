@@ -1,4 +1,4 @@
-from promotions import Promotion  # Import nötig für Typprüfung
+from promotions import Promotion
 
 class Product:
     def __init__(self, name: str, price: float, quantity: int):
@@ -80,16 +80,12 @@ class NonStockedProduct(Product):
 
 
 class LimitedProduct(Product):
-    def __init__(self, name: str, price: float, quantity: int, maximum_per_order: int):
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
         super().__init__(name, price, quantity)
-        self.maximum_per_order = maximum_per_order
+        self.maximum = maximum
 
     def buy(self, quantity: int) -> float:
-        if quantity > self.maximum_per_order:
-            raise ValueError(f"Cannot buy more than {self.maximum_per_order} of this product.")
+        if quantity > self.maximum:
+            raise ValueError(f"Cannot buy more than {self.maximum} of this product.")
         return super().buy(quantity)
-
-    def show(self) -> str:
-        return f"{self.name} (Max {self.maximum_per_order}/order), Price: {self.price}, Quantity: {self.quantity}"
-
 
