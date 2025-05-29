@@ -1,3 +1,5 @@
+from promotions import Promotion  # Import nötig für Typprüfung
+
 class Product:
     def __init__(self, name: str, price: float, quantity: int):
         if not name:
@@ -11,6 +13,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def __str__(self):
         return f"{self.name} - ${self.price}, Quantity: {self.quantity}"
@@ -34,17 +37,30 @@ class Product:
     def deactivate(self):
         self.active = False
 
+    def set_promotion(self, promotion: Promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
+
     def show(self) -> str:
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
+        promo_info = f" (Promotion: {self.promotion.name})" if self.promotion else ""
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}{promo_info}"
 
     def buy(self, quantity: int) -> float:
         if quantity <= 0:
             raise ValueError("Purchase quantity must be greater than zero.")
         if quantity > self.quantity:
             raise ValueError("Not enough stock available.")
-        total_price = quantity * self.price
+
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
+
         self.set_quantity(self.quantity - quantity)
         return total_price
+
 
 
 class NonStockedProduct(Product):
